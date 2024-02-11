@@ -1,0 +1,144 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+class Book {
+    private String title;
+    private String author;
+    private String ISBN;
+    private boolean isAvailable;
+
+    public Book(String title, String author, String ISBN) {
+        this.title = title;
+        this.author = author;
+        this.ISBN = ISBN;
+        this.isAvailable = true;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public String getISBN() {
+        return ISBN;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void markAsBorrowed() {
+        isAvailable = false;
+    }
+
+    public void markAsReturned() {
+        isAvailable = true;
+    }
+
+    @Override
+    public String toString() {
+        return "Title: " + title + "\nAuthor: " + author + "\nISBN: " + ISBN + "\nAvailable: " + isAvailable;
+    }
+}
+
+public class LibraryManagementSystem {
+    private List<Book> libraryInventory = new ArrayList<>();
+
+    public void addBookToInventory(Book book) {
+        libraryInventory.add(book);
+    }
+
+    public void displayAvailableBooks() {
+        System.out.println("Available Books in the Library:");
+        for (Book book : libraryInventory) {
+            if (book.isAvailable()) {
+                System.out.println(book);
+                System.out.println("---------------");
+            }
+        }
+    }
+
+    public Book findBookByISBN(String ISBN) {
+        for (Book book : libraryInventory) {
+            if (book.getISBN().equals(ISBN)) {
+                return book;
+            }
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        LibraryManagementSystem library = new LibraryManagementSystem();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("Library Management System Menu:");
+            System.out.println("1. Add a new book");
+            System.out.println("2. Borrow a book");
+            System.out.println("3. Return a book");
+            System.out.println("4. Display available books");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume the newline character
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter title: ");
+                    String title = scanner.nextLine();
+                    System.out.print("Enter author: ");
+                    String author = scanner.nextLine();
+                    System.out.print("Enter ISBN: ");
+                    String ISBN = scanner.nextLine();
+                    Book newBook = new Book(title, author, ISBN);
+                    library.addBookToInventory(newBook);
+                    break;
+                case 2:
+                    System.out.print("Enter ISBN of the book to borrow: ");
+                    String borrowISBN = scanner.nextLine();
+                    Book borrowBook = library.findBookByISBN(borrowISBN);
+                    if (borrowBook != null) {
+                        if (borrowBook.isAvailable()) {
+                            borrowBook.markAsBorrowed();
+                            System.out.println("You have successfully borrowed the book:\n" + borrowBook);
+                        } else {
+                            System.out.println("Sorry, the book is not available for borrowing.");
+                        }
+                    } else {
+                        System.out.println("Book with ISBN " + borrowISBN + " not found in the library.");
+                    }
+                    break;
+                case 3:
+                    System.out.print("Enter ISBN of the book to return: ");
+                    String returnISBN = scanner.nextLine();
+                    Book returnBook = library.findBookByISBN(returnISBN);
+                    if (returnBook != null) {
+                        if (!returnBook.isAvailable()) {
+                            returnBook.markAsReturned();
+                            System.out.println("You have successfully returned the book:\n" + returnBook);
+                        } else {
+                            System.out.println("You can only return books that you have borrowed.");
+                        }
+                    } else {
+                        System.out.println("Book with ISBN " + returnISBN + " not found in the library.");
+                    }
+                    break;
+                case 4:
+                    library.displayAvailableBooks();
+                    break;
+                case 5:
+                    System.out.println("Goodbye!");
+                    System.exit(0);
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please select a valid option.");
+            }
+        }
+    }
+}
+
